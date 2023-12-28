@@ -8,8 +8,20 @@ interface IUser extends Document {
     createTime: DateConstructor
 }
 
+interface IRegister extends Document {
+    shopName: string,
+    chargePerson: string,
+    licenseInformation: string,
+    shopLocation: string,
+    phone: string,
+    email: string,
+    isAdmin: boolean
+}
+
 export default class DBconfig {
     private informationManagementSchema: Schema;
+    private registerManagementSchema: Schema;
+    private RegisterManagementMessage: Model<IRegister>; //注册信息
     private InformationManagementMessage: Model<IUser>; //文档类型
     constructor() {
         this.informationManagementSchema = new Schema({
@@ -19,7 +31,19 @@ export default class DBconfig {
             status: Boolean,
             createTime: String
         })
+
+        this.registerManagementSchema = new Schema({
+            shopName: String,
+            chargePerson: String,
+            licenseInformation: String,
+            shopLocation: String,
+            phone: String,
+            email: String,
+            isAdmin: Boolean
+        })
+
         this.InformationManagementMessage = mongoose.model<IUser>("Management", this.informationManagementSchema)
+        this.RegisterManagementMessage = mongoose.model<IRegister>("Register", this.registerManagementSchema)
     }
 
     public async getUserPasswordMessages(data: any) { //登陆查询，用户名和密码是否正确
@@ -30,7 +54,7 @@ export default class DBconfig {
             username: data.data.username,
             password: data.data.password
         })
-        console.log(person,data)
+        console.log(person, data)
         if (person.length === 0) {
             console.log("走到这里了")
             return {
@@ -68,7 +92,7 @@ export default class DBconfig {
     public async getPersonMessages(username: any) { //查询用户是否存在
         if (username === undefined) {
             const person = await this.InformationManagementMessage.find({
-                username: {$ne: username}
+                username: { $ne: username }
             })
             return person;
         } else {
@@ -87,4 +111,30 @@ export default class DBconfig {
 
         return result.deletedCount;
     }
+
+    // 向数据库内添加申请注册数据
+    public async registerAccout(data: IRegister) {
+        const registerMessage = new this.RegisterManagementMessage({
+            shopName: data.shopName,
+            chargePerson: data.chargePerson,
+            licenseInformation: data.licenseInformation,
+            shopLocation: data.shopLocation,
+            phone: data.phone,
+            email: data.email,
+            isAdmin: false
+        })
+
+        const result = await registerMessage.save()
+        // console.log("我是注册", data)
+        return result;
+    }
+    // 向数据库内添加申请注册数据
+    public async getAccountRegisterApprove(data: IRegister) {
+        const registerMessage = await this.RegisterManagementMessage.find()
+
+        // const result = await registerMessage.save()
+        console.log("我是注册", registerMessage)
+        return registerMessage;
+    }
+
 }
