@@ -9,13 +9,17 @@ interface IUser extends Document {
 }
 
 interface IRegister extends Document {
+    approvalCode: string
     shopName: string,
     chargePerson: string,
     licenseInformation: string,
     shopLocation: string,
     phone: string,
     email: string,
-    isAdmin: boolean
+    isAdmin: boolean,
+    isHandle: boolean,
+    refuseReason: string,
+    type: 'Pass' | 'Refuse' | 'Unapproved',
 }
 
 export default class DBconfig {
@@ -33,13 +37,17 @@ export default class DBconfig {
         })
 
         this.registerManagementSchema = new Schema({
+            approvalCode: String,
             shopName: String,
             chargePerson: String,
             licenseInformation: String,
             shopLocation: String,
             phone: String,
             email: String,
-            isAdmin: Boolean
+            isAdmin: Boolean,
+            isHandle: Boolean,
+            refuseReason: String,
+            type: String
         })
 
         this.InformationManagementMessage = mongoose.model<IUser>("Management", this.informationManagementSchema)
@@ -115,26 +123,58 @@ export default class DBconfig {
     // 向数据库内添加申请注册数据
     public async registerAccout(data: IRegister) {
         const registerMessage = new this.RegisterManagementMessage({
+            approvalCode: data.phone, //code就是手机号 唯一
             shopName: data.shopName,
             chargePerson: data.chargePerson,
             licenseInformation: data.licenseInformation,
             shopLocation: data.shopLocation,
             phone: data.phone,
             email: data.email,
-            isAdmin: false
+            isAdmin: false,
+            isHandle: false,
+            refuseReason: '',
+            type: 'Unapproved'
         })
 
         const result = await registerMessage.save()
-        // console.log("我是注册", data)
         return result;
     }
     // 向数据库内添加申请注册数据
     public async getAccountRegisterApprove(data: IRegister) {
-        const registerMessage = await this.RegisterManagementMessage.find()
-
-        // const result = await registerMessage.save()
-        console.log("我是注册", registerMessage)
+        const registerMessage = await this.RegisterManagementMessage.find({
+            isHandle: data.isHandle
+        })
         return registerMessage;
+    }
+
+    // 修改注册审批商户状态
+    public async updateManagementStatus(data: IRegister) {
+        // 根据id更新数据
+        const registerMessage = await this.RegisterManagementMessage.updateOne({
+            approvalCode: data.approvalCode
+        }, {
+            type: data.type,
+            isHandle: true,
+            refuseReason: data.refuseReason
+        })
+        return registerMessage;
+    }
+
+    // 修改注册审批商户状态
+    public async getTotal() {
+        // 根据id更新数据
+        const untreated = await this.RegisterManagementMessage.find({
+            isHandle: false
+        })
+        const processed = await this.RegisterManagementMessage.find({
+            isHandle: true
+        })
+
+        const untreatedNumber = untreated.length;
+        const processedNumber = processed.length;
+
+
+        return { untreatedNumber, processedNumber };
     }
 
 }

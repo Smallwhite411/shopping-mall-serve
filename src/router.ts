@@ -84,7 +84,6 @@ router.post('/backstage/account-register', (request, response) => { //增加
 router.post('/backstage/getAccountRegisterApprove', async (request, response) => { //增加
     const data = request.body;
     const registerMessage = await DBconfigs.getAccountRegisterApprove(data);
-    console.log('registerMessage', registerMessage);
 
     response.send({
         code: 200,
@@ -94,6 +93,30 @@ router.post('/backstage/getAccountRegisterApprove', async (request, response) =>
         },
         total: registerMessage.length,
         tableId: 'ddddd'
+    })
+})
+// 修改注册审批商户状态
+router.post('/backstage/approval-management/updateStatus', (request, response) => { //修改成绩
+    const data = request.body;
+    DBconfigs.updateManagementStatus(data)
+
+    response.send({
+        code: 200,
+        message: "成功",
+    })
+})
+
+// 获取审批数量
+router.get('/backstage/approval-management/getTotal', async (request, response) => { //查询
+    let management = await DBconfigs.getTotal()
+
+    response.send({
+        code: 200,
+        message: "成功",
+        data: {
+            untreated: management.untreatedNumber,
+            processed: management.processedNumber,
+        }
     })
 })
 
