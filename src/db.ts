@@ -123,7 +123,7 @@ export default class DBconfig {
     // 向数据库内添加申请注册数据
     public async registerAccout(data: IRegister) {
         const registerMessage = new this.RegisterManagementMessage({
-            approvalCode: data.phone, //code就是手机号 唯一
+            approvalCode: data.email, //code就是手机号 唯一
             shopName: data.shopName,
             chargePerson: data.chargePerson,
             licenseInformation: data.licenseInformation,
@@ -175,6 +175,17 @@ export default class DBconfig {
 
 
         return { untreatedNumber, processedNumber };
+    }
+
+    // 获取已审批成功商户
+    public async getAccountPage() {
+        const registerMessage = await this.RegisterManagementMessage.find({
+            isHandle: true,
+            type: 'Pass'
+        })
+        console.log('我是查询0',registerMessage);
+        
+        return registerMessage;
     }
 
 }

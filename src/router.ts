@@ -119,6 +119,20 @@ router.get('/backstage/approval-management/getTotal', async (request, response) 
         }
     })
 })
+// 修改注册审批商户状态
+router.post('/backstage/merchant-management/page', async (request, response) => { //修改成绩
+    const data = request.body;
+    const registerMessage = await DBconfigs.getAccountPage()
 
+    response.send({
+        code: 200,
+        message: "成功",
+        data: {
+            records: registerMessage
+        },
+        total: registerMessage.length,
+        tableId: 'ddddd'
+    })
+})
 
 export default router;
