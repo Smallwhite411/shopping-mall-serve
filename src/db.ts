@@ -62,9 +62,8 @@ export default class DBconfig {
             username: data.data.username,
             password: data.data.password
         })
-        console.log(person, data)
         if (person.length === 0) {
-            console.log("走到这里了")
+            // console.log("走到这里了")
             return {
                 message: "没有找到此账号，请检查是否输入错误",
                 isLogin: false
@@ -183,9 +182,19 @@ export default class DBconfig {
             isHandle: true,
             type: 'Pass'
         })
-        console.log('我是查询0',registerMessage);
-        
+
         return registerMessage;
     }
+
+    // 上传图片
+    public async uploadFile() {
+        // const registerMessage = await this.RegisterManagementMessage.find({
+        //     isHandle: true,
+        //     type: 'Pass'
+        // })
+        // console.log('我是查询0', registerMessage);
+
+        // return registerMessage;
+    } 
 
 }
