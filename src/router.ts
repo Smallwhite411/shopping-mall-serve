@@ -1,8 +1,29 @@
 import express from "express"
 import DBconfig from "./db"
-
+import multer from 'multer'
+import fs from 'fs'
+import path from 'path'
 const router = express.Router()
 const DBconfigs = new DBconfig()
+
+const storage = multer.diskStorage({
+    // 上传文件目录
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/');
+    },
+    // 上传文件名称
+    filename: function (req, file, cb) {
+        // var changedName = (new Date().getTime()) + '-' + file.originalname;
+        cb(null, file.originalname);
+    }
+})
+
+const upload = multer({
+    storage
+})
+// 创建一个接收为编码的二进制数据流的方法实例 接收 name 为 newimg 字段的上传文件，最大接收为 1
+// var cpUpload = upload.fields([{ name: 'newimg', maxCount: 1 }])
+
 
 router.post('/users/login', async (request, response) => {
     const data = request.body
@@ -134,20 +155,17 @@ router.post('/backstage/merchant-management/page', async (request, response) => 
 })
 
 // 上传图片
-router.post('/file/upload', async (request, response) => { //修改成绩
-    const data = request.body;
-    const registerMessage = await DBconfigs.getAccountPage()
-
-    console.log('我是上传文件',data)
-    // response.send({
-    //     code: 200,
-    //     message: "成功",
-    //     data: {
-    //         records: registerMessage
-    //     },
-    //     total: registerMessage.length,
-    //     tableId: 'ddddd'
-    // })
+router.post('/file/upload', upload.single('file'), async (req, res) => { //修改成绩
+    const data = req.file;
+    // // const registerMessage = await DBconfigs.getAccountPage()
+    console.log(data)
+    res.send({
+        code: 200,
+        message: "成功",
+        data: {
+            fileId: data.path
+        },
+    })
 })
 
 export default router;
