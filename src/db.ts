@@ -22,11 +22,22 @@ interface IRegister extends Document {
     type: 'Pass' | 'Refuse' | 'Unapproved',
 }
 
+interface IUserRegister extends Document {
+    userCode: string //用户ID
+    nickname: string, //昵称
+    shippingAddress: string,  //收货地址
+    phone: string, //电话
+    email: string, //邮箱
+    remark: string //备注
+}
+
 export default class DBconfig {
     private informationManagementSchema: Schema;
     private registerManagementSchema: Schema;
+    private userRegisterManagementSchema: Schema
     private RegisterManagementMessage: Model<IRegister>; //注册信息
     private InformationManagementMessage: Model<IUser>; //文档类型
+    private UserRegisternManagementMessage: Model<IUserRegister>; //文档类型
     constructor() {
         this.informationManagementSchema = new Schema({
             username: String,
@@ -49,9 +60,18 @@ export default class DBconfig {
             refuseReason: String,
             type: String
         })
+        this.userRegisterManagementSchema = new Schema({
+            userCode: String, //用户ID
+            nickname: String, //昵称
+            shippingAddress: String,  //收货地址
+            phone: String, //电话
+            email: String, //邮箱
+            remark: String //备注
+        })
 
         this.InformationManagementMessage = mongoose.model<IUser>("Management", this.informationManagementSchema)
         this.RegisterManagementMessage = mongoose.model<IRegister>("Register", this.registerManagementSchema)
+        this.UserRegisternManagementMessage = mongoose.model<IUserRegister>("UserRegister", this.userRegisterManagementSchema)
     }
 
     public async getUserPasswordMessages(data: any) { //登陆查询，用户名和密码是否正确
@@ -195,6 +215,21 @@ export default class DBconfig {
         // console.log('我是查询0', registerMessage);
 
         // return registerMessage;
-    } 
+    }
+
+    // 用户注册
+    public async userRegister(data: IUserRegister) {
+        const userRegisterMessage = new this.UserRegisternManagementMessage({
+            userCode: data.userCode, //用户ID
+            nickname: '-', //昵称
+            shippingAddress: '-',  //收货地址
+            phone: data.phone, //电话
+            email: data.email, //邮箱
+            remark: data.remark //备注
+        })
+
+        const result = await userRegisterMessage.save()
+        return result;
+    }
 
 }

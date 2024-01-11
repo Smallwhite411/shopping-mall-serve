@@ -168,4 +168,17 @@ router.post('/file/upload', upload.single('file'), async (req, res) => { //修�
     })
 })
 
+router.post('/client/register', async (req, res) => { //修改成绩
+    const data = req.body;
+
+    const userRegisterMessage = await DBconfigs.userRegister(data)
+
+    res.send({
+        code: 200,
+        message: "注册成功",
+        data: data
+    })
+
+})
+
 export default router;
