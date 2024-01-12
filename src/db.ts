@@ -232,4 +232,10 @@ export default class DBconfig {
         return result;
     }
 
+    // 获取用户列表
+    public async getUserRegisterMessage(data: any) {
+        const userRegisterMessage = await this.UserRegisternManagementMessage.find()
+        return userRegisterMessage;
+    }
+
 }

@@ -24,6 +24,15 @@ const upload = multer({
 // 创建一个接收为编码的二进制数据流的方法实例 接收 name 为 newimg 字段的上传文件，最大接收为 1
 // var cpUpload = upload.fields([{ name: 'newimg', maxCount: 1 }])
 
+// 通用筛选功能
+router.post('/merchant-account-management/getTableFilter', async (req, res) => {
+    const data = req.body
+    res.send({
+        code: 200,
+        data: []
+    })
+})
+
 
 router.post('/users/login', async (request, response) => {
     const data = request.body
@@ -168,6 +177,7 @@ router.post('/file/upload', upload.single('file'), async (req, res) => { //修�
     })
 })
 
+// 用户注册
 router.post('/client/register', async (req, res) => { //修改成绩
     const data = req.body;
 
@@ -179,6 +189,23 @@ router.post('/client/register', async (req, res) => { //修改成绩
         data: data
     })
 
+})
+
+// 获取用户列表
+router.post('/backstage/user-management/page', async (request, response) => {
+    const data = request.body;
+    const userRegisterMessage = await DBconfigs.getUserRegisterMessage(data);
+    console.log('userRegisterMessage', userRegisterMessage);
+
+    response.send({
+        code: 200,
+        message: "成功",
+        data: {
+            records: userRegisterMessage
+        },
+        total: userRegisterMessage.length,
+        tableId: 'ddddd'
+    })
 })
 
 export default router;
