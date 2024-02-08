@@ -208,4 +208,53 @@ router.post('/backstage/user-management/page', async (request, response) => {
     })
 })
 
+// 客户端登录接口
+router.post('/client/login', async (req, res) => {
+    const data = req.body;
+    const userRegisterMessage = await DBconfigs.getUserMessagesVerification(data);
+    console.log('userRegisterMessage', data, userRegisterMessage);
+
+    res.send({
+        code: 200,
+        message: "成功",
+        data: {
+            token: userRegisterMessage[0]._id
+        },
+    })
+})
+
+router.get('/client/account/get-account', async (req, res) => {
+    const token = req.headers.authorization;
+    // 根据token拿到当前用户的信息
+    const userData = await DBconfigs.useTokenGetUserMessage(token);
+    console.log('askbjf', userData);
+    res.send({
+        code: 200,
+        message: "成功",
+        data: {
+            email: userData.email,
+            nickname: userData.nickname,
+            phone: userData.phone,
+            shippingAddress: userData.shippingAddress
+        }
+    })
+})
+// 客户端用户修改信息
+router.post('/client/change-user-message', async (req, res) => {
+    const token = req.headers.authorization;
+    const body = req.body;
+    const data = {
+        id: token,
+        body: body
+    }
+    const userRegisterMessage = await DBconfigs.changeUserMessage(data);
+
+    // res.send({
+    //     code: 200,
+    //     message: "成功",
+    //     data: {
+    //         token: userRegisterMessage[0]._id
+    //     },
+    // })
+})
 export default router;

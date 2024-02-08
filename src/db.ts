@@ -27,8 +27,10 @@ interface IUserRegister extends Document {
     nickname: string, //昵称
     shippingAddress: string,  //收货地址
     phone: string, //电话
+    password: string, //密码
     email: string, //邮箱
     remark: string //备注
+    recipient: string //收件人
 }
 
 export default class DBconfig {
@@ -64,9 +66,11 @@ export default class DBconfig {
             userCode: String, //用户ID
             nickname: String, //昵称
             shippingAddress: String,  //收货地址
+            password: String, //密码
             phone: String, //电话
             email: String, //邮箱
-            remark: String //备注
+            remark: String, //备注
+            recipient: String //收件人
         })
 
         this.InformationManagementMessage = mongoose.model<IUser>("Management", this.informationManagementSchema)
@@ -221,11 +225,13 @@ export default class DBconfig {
     public async userRegister(data: IUserRegister) {
         const userRegisterMessage = new this.UserRegisternManagementMessage({
             userCode: data.userCode, //用户ID
-            nickname: '-', //昵称
-            shippingAddress: '-',  //收货地址
+            nickname: '', //昵称
+            shippingAddress: '',  //收货地址
             phone: data.phone, //电话
+            password: data.password, //密码
             email: data.email, //邮箱
-            remark: data.remark //备注
+            remark: '', //备注
+            recipient: '' //收件人
         })
 
         const result = await userRegisterMessage.save()
@@ -236,6 +242,63 @@ export default class DBconfig {
     public async getUserRegisterMessage(data: any) {
         const userRegisterMessage = await this.UserRegisternManagementMessage.find()
         return userRegisterMessage;
+    }
+
+    // 获取登录用户信息
+    public async getUserMessagesVerification(data: any) {
+        const datas = await this.UserRegisternManagementMessage.find({
+            email: data.email,
+            password: data.password
+        })
+        return datas;
+    }
+    // 根据token拿到对应用户的信息
+    public async useTokenGetUserMessage(data: any) {
+        const userMessage = await this.UserRegisternManagementMessage.findById(data)
+        return userMessage;
+    }
+
+    // 根据id找到当前用户信息并修改资料
+    public async changeUserMessage(data: any,) {
+        console.log("拿到的data是：", data);
+
+        // const userMessage = await this.UserRegisternManagementMessage.findOne({
+        //     _id: data.id
+        // })
+        const userMessage = await this.UserRegisternManagementMessage.updateOne({
+            _id: data.id
+        }, {
+            nickname: data.body.nickname,
+            recipient: data.body.recipient,
+            shippingAddress: data.body.shippingAddress,
+            phone: data.body.phone,
+        })
+        console.log(userMessage);
+        
+
+        //     this.UserRegisternManagementMessage.updateOne({
+        //         _id: data.id
+        //     }, {
+        //         nickname: data.body.nickname,
+        //         recipient: data.body.recipient,
+        //         shippingAddress: data.body.shippingAddress,
+        //         phone: data.body.phone,
+        //     }, (err2: any) => {
+        //         if (err2) {
+        //             return {
+        //                 status: 400,
+        //                 msg: err1.message
+        //             }
+        //         } else {
+        //             return {
+        //                 status: 200,
+        //                 msg: '修改成功！'
+        //             }
+        //         }
+        //     })
+        console.log(userMessage);
+
+        // return userMessage;
     }
 
 }
